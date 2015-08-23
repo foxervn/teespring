@@ -1,0 +1,29 @@
+body {
+    background: #edeef0;
+}
+
+.main {
+    margin-top: 20px;
+}
+
+.product {
+      background: #fff;
+      margin-bottom: 20px;
+      padding: 10px;
+}
+
+.image {
+    text-align: center;
+}
+
+.image img {
+    height: 229px;
+}
+
+.pagination-nav {
+    text-align: center;
+}
+
+.footer {
+    text-align:  center;
+}
