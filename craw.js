@@ -26,5 +26,3 @@ while ((m = re.exec(str)) !== null) {
 
 
 document.getElementById("u_0_r").click()
-var re = /"(https?:\/\/teespring.com\/[^\s]+)"/gmi; 
-var re = /(https?:\/\/teespring.com\/[^\s]+)<\//gmi; 
