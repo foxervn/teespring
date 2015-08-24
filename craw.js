@@ -7,22 +7,27 @@ function contains(list, k) {
   return false;
 }
 
-
-var re = /(https?:\/\/teespring.com\/[a-zA-Z0-9-]+)/gmi; 
-var str = document.getElementById("contentArea").innerHTML;
-var m;
 var links = [];
-var count = 0; 
-while ((m = re.exec(str)) !== null) {
-    if (m.index === re.lastIndex) {
-        re.lastIndex++;
+var count = 0;
+var re = /(https?:\/\/teespring.com\/[a-zA-Z0-9-]+)/gmi; 
+
+function craw() {
+    var str = document.getElementById("contentArea").innerHTML;
+    var m;
+    
+    while ((m = re.exec(str)) !== null) {
+        if (m.index === re.lastIndex) {
+            re.lastIndex++;
+        }
+        if (!contains(links, m[0])) {
+            count++;
+            links.push(m[0]);
+            console.log(count + ": " + m[0]);
+        }
     }
-    if (!contains(links, m[0])) {
-        count++;
-        links.push(m[0]);
-        console.log(count + ": " + m[0]);
-    }
+
+
+    document.getElementById("u_0_r").click();
 }
 
-
-document.getElementById("u_0_r").click()
+var t = setInterval(craw, 1000 * 60);

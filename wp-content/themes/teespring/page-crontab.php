@@ -1,6 +1,7 @@
 <?php
 
 global $wpdb;
+
 $secret = $_GET["secret"];
 if ($secret == "123456aA@") {
     $page = 1;
@@ -11,15 +12,15 @@ if ($secret == "123456aA@") {
         foreach ($data->hits as $hit) {
             $objectID = $hit->objectID;
             $wpdb->replace(
-                    'product', array(
+                'product', array(
                 'objectID' => $objectID,
                 'sold' => $hit->amount_ordered,
                 'updated_at' => $time
-                    ), array(
-                '%d',
-                '%d',
-                '%s'
-                    )
+            ), array(
+                    '%d',
+                    '%d',
+                    '%s'
+                )
             );
         }
     }
