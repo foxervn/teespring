@@ -1,7 +1,5 @@
 <?php
 
-include "XPath.class.php";
-
 $api_key = "5cf4b4f788d542e9e1661cb977480f0dcb5acfdae52786e3bf9593ba8da3ddd4";
 $app_id = "XNF09CCDO4";
 
@@ -127,101 +125,20 @@ function get_product($objectID) {
     return false;
 }
 
-function fetch_product($link) {
-    $html = file_get_contents($link);
+$mongo = new MongoClient("mongodb://teespring:19001221@127.0.0.1/teespring");
+$collection = $mongo->selectCollection("teespring", "product");
 
-    $fields = array(
-        "campaign_id",
-        "goal",
-        "ordered",
-        "price",
-        "image",
-        "image_front",
-        "image_back",
-        "default_side",
-        "name",
-        "time_left"
+function get_products_mongo($page, $per_page) {
+    global $collection;
+
+    $skip = ($page - 1) * $per_page;
+    $products = $collection->find()->sort(array("sold" => -1))->limit($per_page)->skip($skip);
+    $total = $collection->count();
+
+    $data = array(
+        "data" => $products,
+        "total_page" => ceil($total / $per_page)
     );
 
-    $data = [];
-    foreach($fields as $field) {
-        $data[$field] = get_product_field($field, $html);
-    }
-    $data["sold"] = get_sold($html);
-    $data["link"] = $link;
-
     return $data;
-}
-
-function get_sold($html) {
-    $xpath = "//div[@class='campaign_stats__value']";
-    $sold = get_node_value($xpath, $html, true);
-
-    return $sold;
-}
-
-function get_product_field($field, $html) {
-    switch($field) {
-        case "campaign_id" :
-            $re = "/\"campaign_id\":([0-9]+)/mi";
-            break;
-        case "goal" :
-            $re = "/\"goal\":([0-9]+)/mi";
-            break;
-        case "ordered" :
-            $re = "/\"ordered\":([0-9]+)/mi";
-            break;
-        case "price" :
-            $re = "/\"price\":([0-9.]+)/mi";
-            break;
-        case "image" :
-            $re = "/\"image_url\":\"(http(.*).jpg)/mi";
-            break;
-        case "image_front" :
-            $re = "/\"front\":\"(([a-zA-Z0-9_\\/\\-.]+).png)/mi";
-            break;
-        case "image_back" :
-            $re = "/\"back\":\"(([a-zA-Z0-9_\\/\\-.]+).png)/mi";
-            break;
-        case "default_side" :
-            $re = "/\"default_side\":\"([a-z]+)\"/mi";
-            break;
-        case "name" :
-            $re = "/\"name\":\"([^\"]+)\"/mi";
-            break;
-        case "time_left" :
-            $re = "/\"time_left\":\"([^\"]+)\"/mi";
-            break;
-        default:
-            return "";
-    }
-
-    if(preg_match($re, $html, $matches)) {
-        return $matches[1];
-    }
-
-}
-
-function get_node_value($xpath, $url, $single = true) {
-    $html_dom = new DOMDocument();
-    if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
-        $content = file_get_contents($url);
-    } else {
-        $content = $url;
-    }
-    @$html_dom->loadHTML($content);
-    $x_path = new DOMXPath($html_dom);
-    $nodes = $x_path->query($xpath);
-    if(count($nodes)) {
-        if($single) {
-            return $nodes->item(0)->nodeValue;
-        }
-
-        $nodeValues = [];
-        foreach ($nodes as $node) {
-            $nodeValues[] = $node->nodeValue;
-        }
-
-        return $nodeValues;
-    }
 }
