@@ -76,7 +76,7 @@ function wp_schedule_event( $timestamp, $recurrence, $hook, $args = array()) {
 		return false;
 
 	$event = (object) array( 'hook' => $hook, 'timestamp' => $timestamp, 'schedule' => $recurrence, 'args' => $args, 'interval' => $schedules[$recurrence]['interval'] );
-	/** This filter is documented in wp-includes/cron.php */
+	/** This filter is documented in wp-includes/background.php */
 	$event = apply_filters( 'schedule_event', $event );
 
 	// A plugin disallowed this event
@@ -289,7 +289,7 @@ function spawn_cron( $gmt_time = 0 ) {
 	 * }
 	 */
 	$cron_request = apply_filters( 'cron_request', array(
-		'url'  => add_query_arg( 'doing_wp_cron', $doing_wp_cron, site_url( 'wp-cron.php' ) ),
+		'url'  => add_query_arg( 'doing_wp_cron', $doing_wp_cron, site_url( 'wp-background.php' ) ),
 		'key'  => $doing_wp_cron,
 		'args' => array(
 			'timeout'   => 0.01,
@@ -311,8 +311,8 @@ function spawn_cron( $gmt_time = 0 ) {
  */
 function wp_cron() {
 
-	// Prevent infinite loops caused by lack of wp-cron.php
-	if ( strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') !== false || ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) )
+	// Prevent infinite loops caused by lack of wp-background.php
+	if ( strpos($_SERVER['REQUEST_URI'], '/wp-background.php') !== false || ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) )
 		return;
 
 	if ( false === $crons = _get_cron_array() )

@@ -24,8 +24,13 @@ $data = get_products($page, $per_page);
         <div class="header">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-12">
-                        <h3>Hot campaigns from Teespring</h3>
+                    <div class="col-md-12 col-lg-12">
+                        <div class="header-buttons">
+                            <div class="pull-left btn-home">
+                                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-default">Home</a>
+                                <a href="<?php echo esc_url( home_url( '/' ) ); ?>?page_id=7" class="btn btn-success">Home new</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

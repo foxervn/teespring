@@ -3,7 +3,10 @@
 $api_key = "5cf4b4f788d542e9e1661cb977480f0dcb5acfdae52786e3bf9593ba8da3ddd4";
 $app_id = "XNF09CCDO4";
 
-function make_request($url, $data, $method) {
+function make_request($url, $data, $method)
+{
+    global $api_key, $app_id;
+
     $ch = curl_init($url);
 
     curl_setopt($ch, CURLOPT_VERBOSE, 1);
@@ -12,10 +15,10 @@ function make_request($url, $data, $method) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        "Content-Type: application/json",
-        "X-Algolia-API-Key: $api_key",
-        "X-Algolia-Application-Id: $app_id",
-        'Content-Length: ' . strlen($data))
+            "Content-Type: application/json",
+            "X-Algolia-API-Key: $api_key",
+            "X-Algolia-Application-Id: $app_id",
+            'Content-Length: ' . strlen($data))
     );
 
     $response = curl_exec($ch);
@@ -24,7 +27,8 @@ function make_request($url, $data, $method) {
     return $response;
 }
 
-function get_url_paging($page) {
+function get_url_paging($page)
+{
     $string = $_SERVER['REQUEST_URI'];
     if (preg_match("/page=[0-9]+/", $string)) {
         return preg_replace('(page=[0-9]+)', "page=" . $page, $string);
@@ -36,7 +40,8 @@ function get_url_paging($page) {
     }
 }
 
-function paging($page, $last, $range) {
+function paging($page, $last, $range)
+{
     $totalpages = $last;
     $page = $page;
 
@@ -73,14 +78,15 @@ function paging($page, $last, $range) {
     echo '</ul></nav>';
 }
 
-function get_time_left($date) {
+function get_time_left($date)
+{
     $time = strtotime($date) - time();
 
     $days = $time / 24 / 60 / 60;
 
     if (floor($days) == $days) {
         return $days . " days";
-    } elseif($time > 0) {
+    } elseif ($time > 0) {
         $mins = floor(($days - floor($days)) * 24 * 60);
         return floor($days) . " days " . $mins . " mins";
     } else {
@@ -88,18 +94,19 @@ function get_time_left($date) {
     }
 }
 
-function get_products($page, $per_page) {
+function get_products($page, $per_page)
+{
     global $app_id, $api_key;
-    
+
     $url = "http://xnf09ccdo4-3.algolia.io/1/indexes/site_wide_search_index_production/query";
     $method = "POST";
 
     $args = array(
         "params" => http_build_query(array(
-            "hitsPerPage" => $per_page,
-            "page" => $page - 1,
-            "attributesToRetrieve" => "*"
-                )
+                "hitsPerPage" => $per_page,
+                "page" => $page - 1,
+                "attributesToRetrieve" => "*"
+            )
         ),
         "apiKey" => $api_key,
         "appID" => $app_id,
@@ -115,25 +122,44 @@ function get_products($page, $per_page) {
     return $data;
 }
 
-function get_product($objectID) {
+function get_product($objectID)
+{
     global $wpdb;
     $product = $wpdb->get_row("SELECT * FROM product WHERE objectID = $objectID");
-    if($product != null) {
+    if ($product != null) {
         return $product;
     }
-    
+
     return false;
 }
 
 $mongo = new MongoClient("mongodb://teespring:19001221@127.0.0.1/teespring");
 $collection = $mongo->selectCollection("teespring", "product");
 
-function get_products_mongo($page, $per_page) {
+function get_products_mongo($page = 1, $per_page = 20, $from = null, $domain = null)
+{
     global $collection;
 
     $skip = ($page - 1) * $per_page;
-    $products = $collection->find()->sort(array("sold" => -1))->limit($per_page)->skip($skip);
-    $total = $collection->count();
+
+    $args = [];
+
+    if (isset($from) && $from != "all") {
+        $args["from"] = $from;
+    }
+
+    if (isset($domain) && $domain != "all") {
+        $args["domain"] = $domain;
+    }
+
+    if(count($args)) {
+        $cursor = $collection->find($args);
+    } else {
+        $cursor = $collection->find();
+    }
+
+    $products = $cursor->sort(array("sold" => -1))->limit($per_page)->skip($skip);
+    $total = $cursor->count();
 
     $data = array(
         "data" => $products,

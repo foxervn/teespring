@@ -7,17 +7,44 @@ body {
 }
 
 .product {
-      background: #fff;
-      margin-bottom: 20px;
-      padding: 10px;
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 30px 10px 10px 10px;
+    position: relative;
+}
+
+.from {
+    position: absolute;
+    top: 3px;
+    left: 0px;
+}
+
+.domain {
+    position: absolute;
+    top: 3px;
+    left: 60px;
+}
+
+.last-fetch {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    font-style: italic;
 }
 
 .image {
-    text-align: center;
+    height: 229px;
+    background: #ffffff center no-repeat;
+    overflow: hidden;
 }
 
-.image img {
-    height: 229px;
+.image > a {
+    display: block;
+    line-height: 229px;
+}
+
+.image > a:hover {
+    text-decoration: none;
 }
 
 .pagination-nav {
@@ -25,5 +52,14 @@ body {
 }
 
 .footer {
-    text-align:  center;
+    text-align: center;
+}
+
+.header-buttons {
+    margin-top:20px;
+    margin-bottom:10px;
+}
+
+.btn-home {
+    margin-right: 289px;
 }
